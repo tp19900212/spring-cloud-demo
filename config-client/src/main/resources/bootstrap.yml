@@ -1,0 +1,28 @@
+# 注意：bootstrap.yml的配置先加载，一定要在bootstrap.yml中先配置config-server的地址，不然无法获取server端的配置信息
+spring:
+  cloud:
+    bus:
+      trace:
+        enabled: true
+    config:
+      # label代表要请求那个git分支
+      label: master
+      # name代表请求那个服务名称的远程文件，可以写多个，逗号分隔
+      name: config-info
+      # profile代表那个分支对应的文件，如：dev、test、prod
+      profile: dev
+      # 这里基于服务发现，不指定uri
+      discovery:
+        enabled: true
+        service-id: config-server
+      # uri代表config-server的地址
+      #uri: http://localhost:2000
+
+# 注册中心配置
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://tp:123456@localhost:8760/eureka/ #如果Eureka服务端不开启安全认证则为：http://localhost:8760/eureka/
+
