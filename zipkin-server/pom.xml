@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.0.6.RELEASE</version>
+        <version>2.1.5.RELEASE</version>
         <relativePath/>
     </parent>
 
@@ -19,8 +19,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
-        <spring-cloud.version>Finchley.SR2</spring-cloud.version>
-        <zipkin.version>2.12.0</zipkin.version>
+        <spring-cloud.version>Greenwich.SR1</spring-cloud.version>
+        <zipkin.version>2.12.1</zipkin.version>
     </properties>
 
     <dependencyManagement>
@@ -36,6 +36,10 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
         <!--eureka：服务治理，客户端-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -52,6 +56,21 @@
             <groupId>io.zipkin.java</groupId>
             <artifactId>zipkin-autoconfigure-ui</artifactId>
             <version>${zipkin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <exclusions><!-- 去掉默认配置 -->
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

@@ -7,3 +7,8 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://tp:123456@localhost:8760/eureka/ #如果Eureka服务端不开启安全认证则为：http://localhost:8760/eureka/
+management:
+  metrics:
+    web:
+      server:
+        auto-time-requests: false
