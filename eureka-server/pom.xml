@@ -19,7 +19,6 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
         </dependency>
-
         <!--security：提高注册中心安全性，客户端如果需要注册服务到Eureka，需要提供账号、密码（见application.yml）-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
