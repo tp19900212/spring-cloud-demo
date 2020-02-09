@@ -28,6 +28,8 @@
         <module>service-turbine</module>
         <module>service-gateway</module>
         <module>dynamic-route</module>
+        <module>config-server</module>
+        <module>config-client</module>
     </modules>
 
     <properties>

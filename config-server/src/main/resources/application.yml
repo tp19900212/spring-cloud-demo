@@ -1,0 +1,48 @@
+# config-server会在本地的临时目录下克隆远程仓库中的信息
+# 在使用了Git或SVN仓库之后,文件都会在 Config Server 的地文件系统保存一份,
+# 这些文件默认会被存储于以config-repo为前缀的临时目录中,比如名为/tmp/config-repo-<随机数>的目录。
+# 由于其随机性以及临时目录的特性,可能会有一些不可预知的后果,为了避免将来可能会出现的问题,最好的办法就是指定一个固定的位置来存储这些重要信息。
+# 我们只需要通过spring.cloud.config.server.git.basedir或spring.cloud.config.server.svn.basedir来配置一个我们准备好的目录即可
+
+server:
+  port: 2000
+
+spring:
+  application:
+    name: config-server
+  cloud:
+    bus:
+      trace:
+        enabled: true
+    config:
+      server:
+        git:
+          # git远程仓库的地址
+          uri: https://github.com/tp19900212/spring-cloud-config-repository.git
+          # 搜索远程仓库的文件夹相对地址，可以配置多个，用,分割
+          searchPaths: config-info
+          # git仓库的账号
+          username: 42517269@qq.com
+          # git仓库的密码，私有仓库密码必填，非私有仓库可以不填
+          password:
+          # config-server会在本地的临时目录下克隆远程仓库中的信息
+          # 可通过basedir更改本地仓库clone的配置文件信息的路径，本例只为了演示，生产环境尽量不要用中文
+          basedir: ${user.home}/测试文件夹可删除/local-config-repository
+          # 本地仓库如果有脏数据，则会强制拉取（默认是false）
+          force-pull: true
+      label: master # 指定从master分之拉取
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: tp_spring_cloud_config
+
+# 注册中心配置
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://tp:123456@localhost:8760/eureka/ #如果Eureka服务端不开启安全认证则为：http://localhost:8760/eureka/
+
