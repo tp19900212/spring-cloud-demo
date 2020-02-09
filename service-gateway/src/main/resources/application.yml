@@ -1,0 +1,80 @@
+server:
+  port: 9999
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true # 表明gateway开启服务注册和发现的功能，并且spring cloud gateway自动根据服务发现为每一个服务创建了一个router
+          lower-case-service-id: true  # 服务名小写
+      # 下面是写死的路由方式，不推荐，推荐使用动态路由方式
+      routes:
+        - id: service-ribbon
+          uri: lb://service-ribbon # lb代表从注册中心获取服务，且已负载均衡方式转发
+          predicates:
+            - Path=/api-ribbon/**
+          filters:
+            - StripPrefix=1 # 加上StripPrefix=1，否则转发到后端服务时会带上- Path参数配置中的/api-ribbon前缀
+            - TokenAuthenticationFilter # 指定此服务使用的自定义过滤器
+            - name: Hystrix # 熔断降级
+              args:
+                name: default
+                fallback-uri: 'forward:/defaultFallback'
+            - name: RequestRateLimiter # redis限流，filter名称必须是RequestRateLimiter
+              args:
+                key-resolver: '#{@remoteAddrKeyResolver}' # 使用SpEL名称引用Bean，与上面新建的RateLimiterConfig类中的bean的name相同
+                redis-rate-limiter:
+                  replenish-rate: 20 # 每秒最大访问次数(允许用户每秒处理多少个请求)
+                  burst-capacity: 20 # 令牌桶最大容量(允许在一秒钟内完成的最大请求数)
+        - id: service-feign
+          uri: lb://service-feign
+          predicates:
+            - Path=/api-feign/**
+          filters:
+            - StripPrefix=1
+            - name: Hystrix
+              args:
+                name: default
+                fallback-uri: 'forward:/defaultFallback'
+            - name: RequestRateLimiter # redis限流，filter名称必须是RequestRateLimiter
+              args:
+                key-resolver: '#{@remoteAddrKeyResolver}' # 使用SpEL名称引用Bean，与上面新建的RateLimiterConfig类中的bean的name相同
+                redis-rate-limiter:
+                  replenish-rate: 200 # 每秒最大访问次数(允许用户每秒处理多少个请求)
+                  burst-capacity: 200 # 令牌桶最大容量(允许在一秒钟内完成的最大请求数)
+  redis:
+    host: localhost
+    port: 6379
+    password: tp123456
+# 集成hystrix降级：信号量隔离，3秒后自动超时
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          strategy: SEMAPHORE
+          thread:
+            timeoutInMilliseconds: 3000
+  shareSecurityContext: true
+
+# 注册中心
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://tp:123456@localhost:8760/eureka/ #如果Eureka服务端不开启安全认证则为：http://localhost:8760/eureka/
+
+# 暴露监控端点
+# Spring Cloud Gateway提供了Endpoint端点，暴露路由信息，有获取所有路由、刷新路由、查看单个路由、删除路由等方法
+# 想访问端点中的方法需要添加spring-boot-starter-actuator依赖，并在配置文件中暴露所有端点
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always

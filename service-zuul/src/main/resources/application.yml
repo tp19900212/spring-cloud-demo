@@ -1,0 +1,18 @@
+server:
+  port: 8765
+spring:
+  application:
+    name: service-zuul
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://tp:123456@localhost:8760/eureka/ #如果Eureka服务端不开启安全认证则为：http://localhost:8760/eureka/
+zuul:
+  routes:
+    ribbon-api:
+      path: /api-ribbon/**
+      service-id: service-ribbon
+    feign-api:
+      path: /api-feign/**
+      service-id: service-feign
+  prefix: /tp #设置zuul前缀，加入此前缀后配置后，访问zuul路径需增加前缀/tp，变为：http://localhost:8765/tp/api-ribbon/**

@@ -1,0 +1,31 @@
+server:
+  port: 8764
+spring:
+  application:
+    name: turbine-service
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://tp:123456@localhost:8760/eureka/ #如果Eureka服务端不开启安全认证则为：http://localhost:8760/eureka/
+# 暴露监控端点
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      cors:
+        allowed-origins: '*'
+        allowed-methods: '*'
+  endpoint:
+    health:
+      show-details: always
+    shutdown:
+      enabled: true
+
+#appConfig 配置Eureka中的serviceId列表，表明监控哪些服务，多个服务id用 ， 逗号隔开
+turbine:
+  aggregator:
+    cluster-config: default
+  app-config: service-feign,service-ribbon
+  cluster-name-expression: new String("default")
+  combine-host-port: true
